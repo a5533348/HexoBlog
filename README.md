@@ -1,0 +1,2 @@
+# HexoBlog
+blog storage
