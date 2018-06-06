@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Gitlab," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="介绍Gitlab 是一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面进行访问公开的或者私人项目，非常适合在团队内部使用。在gitlab中有三个版本，分别是CE（社区版）、EE（企业版）、OM（RPM包完整版），这里安装的是CE版。 使用的服务器环境是阿里云的Centos7，1核2G。 开启SWAP由于Gitlab运行需要较多的内存，官方推荐的服务器2核4G，但是这个配置">
+<meta name="keywords" content="Gitlab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Centos7中安装Gitlab实践">
+<meta property="og:url" content="http://xdeveloper.cn/2018/06/06/Centos7中安装Gitlab实践/index.html">
+<meta property="og:site_name" content="再见理想life">
+<meta property="og:description" content="介绍Gitlab 是一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面进行访问公开的或者私人项目，非常适合在团队内部使用。在gitlab中有三个版本，分别是CE（社区版）、EE（企业版）、OM（RPM包完整版），这里安装的是CE版。 使用的服务器环境是阿里云的Centos7，1核2G。 开启SWAP由于Gitlab运行需要较多的内存，官方推荐的服务器2核4G，但是这个配置">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-06-06T06:02:24.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Centos7中安装Gitlab实践">
+<meta name="twitter:description" content="介绍Gitlab 是一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面进行访问公开的或者私人项目，非常适合在团队内部使用。在gitlab中有三个版本，分别是CE（社区版）、EE（企业版）、OM（RPM包完整版），这里安装的是CE版。 使用的服务器环境是阿里云的Centos7，1核2G。 开启SWAP由于Gitlab运行需要较多的内存，官方推荐的服务器2核4G，但是这个配置">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://xdeveloper.cn/2018/06/06/Centos7中安装Gitlab实践/"/>
+
+
+
+
+
+  <title>Centos7中安装Gitlab实践 | 再见理想life</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">再见理想life</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">程序猿的情感世界</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            目录
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://xdeveloper.cn/2018/06/06/Centos7中安装Gitlab实践/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="再见理想life">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Centos7中安装Gitlab实践</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-06T11:17:49+08:00">
+                2018-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>Gitlab 是一个用于仓库管理系统的开源项目，使用Git作为代码管理工具，可通过Web界面进行访问公开的或者私人项目，非常适合在团队内部使用。<br>在gitlab中有三个版本，分别是CE（社区版）、EE（企业版）、OM（RPM包完整版），这里安装的是CE版。</p>
+<p>使用的服务器环境是阿里云的Centos7，1核2G。</p>
+<h4 id="开启SWAP"><a href="#开启SWAP" class="headerlink" title="开启SWAP"></a>开启SWAP</h4><p>由于Gitlab运行需要较多的内存，官方推荐的服务器2核4G，但是这个配置在阿里云上是在是太贵了，一年要1-2k，实在是负担不起，因此我们可以通过开启SWAP来缓解内存的压力。</p>
+<p>如果不开启SWAP的话，2G内存很难把Gitlab跑起来，而且在安装过程中会出现各种问题，卡机。</p>
+<h5 id="什么是SWAP呢？"><a href="#什么是SWAP呢？" class="headerlink" title="什么是SWAP呢？"></a>什么是SWAP呢？</h5><p>Swap分区在系统的物理内存不够用的时候，把硬盘中的一部分空间释放出来，以供当前运行的程序使用。那些被释放的空间可能来自一些很长时间没有什么操作的程序，这些被释放的空间被临时保存到Swap分区中，等到那些程序要运行时，再从Swap分区中恢复保存的数据到内存中。</p>
+<h5 id="SWAP设置"><a href="#SWAP设置" class="headerlink" title="SWAP设置"></a>SWAP设置</h5><p>1、创建用于交换分区的文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dd if=/dev/zero of=/mnt/swap bs=block_size count=number_of_block</span><br></pre></td></tr></table></figure>
+<p>注：block_size、number_of_block 大小可以自定义，比如 bs=1M count=1024 代表设置 1G 大小 SWAP 分区。</p>
+<p>这里推荐分配4G的内存：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dd if=/dev/zero of=/mnt/swap bs=1M count=4096</span><br></pre></td></tr></table></figure>
+<p>2、设置交换分区文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkswap /mnt/swap</span><br></pre></td></tr></table></figure>
+<p>3、立即启用交换分区文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">swapoff /mnt/swap</span><br><span class="line">swapon /mnt/swap</span><br></pre></td></tr></table></figure>
+<p>为了避免出现设备或资源占用的错误，建议先关闭，后打开</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注：如果在 /etc/rc.local 中有 swapoff -a 需要修改为 swapon -a</span><br></pre></td></tr></table></figure>
+<p>4、设置开机时自启用 SWAP 分区：  </p>
+<p>需要修改文件 /etc/fstab 中的 SWAP 行，在文件的最后一行添加</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/mnt/swap swap swap defaults 0 0</span><br></pre></td></tr></table></figure>
+<p>5、修改 swpapiness 参数</p>
+<p>在 Linux 系统中，可以通过查看 /proc/sys/vm/swappiness 内容的值来确定系统对 SWAP 分区的使用原则。当 swappiness 内容的值为 0 时，表示最大限度地使用物理内存，物理内存使用完毕后，才会使用 SWAP 分区。当 swappiness 内容的值为 100 时，表示积极地使用 SWAP 分区，并且把内存中的数据及时地置换到 SWAP 分区。</p>
+<p>这里推荐设置为50，当物理内存使用大于50%时尽可能得使用Swap内存，设置方法如下：</p>
+<p>临时修改：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 10 &gt;/proc/sys/vm/swappiness</span><br></pre></td></tr></table></figure>
+<p>永久修改（推荐）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># vim /etc/sysctl.conf</span><br><span class="line">vm.swappiness=10</span><br><span class="line"># sysctl -p</span><br></pre></td></tr></table></figure>
+<p>这样SWAP分区就设置好了，输入free -m查看：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">free -m</span><br></pre></td></tr></table></figure>
+<p>如果想要关闭的话使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">swapoff /mnt/swap</span><br></pre></td></tr></table></figure>
+<p>然后将以上的设置去掉就可以了。</p>
+<h4 id="安装Gitlab"><a href="#安装Gitlab" class="headerlink" title="安装Gitlab"></a>安装Gitlab</h4><p>这里按照官网的安装指引</p>
+<p>1、安装和配置必要的依赖</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y curl policycoreutils-python openssh-server</span><br><span class="line">sudo systemctl enable sshd</span><br><span class="line">sudo systemctl start sshd</span><br><span class="line">sudo systemctl start firewalld.service</span><br><span class="line">sudo firewall-cmd --permanent --add-service=http</span><br><span class="line">sudo systemctl reload firewalld</span><br></pre></td></tr></table></figure>
+<p>2、添加Gitlab的repository</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash</span><br></pre></td></tr></table></figure>
+<p>3、安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo EXTERNAL_URL=&quot;http://gitlab.example.com&quot; yum install -y gitlab-ee</span><br></pre></td></tr></table></figure>
+<p>这里的EXTERNAL_URL指定成访问的url，没有域名的可以指定IP地址。</p>
+<p>安装的时候会一直保持在同一个界面，不要怀疑它是不是卡了，静候5分钟左右，出现安装成功的提示。</p>
+<h4 id="Gitlab使用"><a href="#Gitlab使用" class="headerlink" title="Gitlab使用"></a>Gitlab使用</h4><p>安装成功后就可以打开上述指定的EXTERNAL_URL打开Gitlab登录了，第一次打会让你设置管理员root的密码。接下来就可以做：</p>
+<ul>
+<li>创建用户</li>
+<li>创建组，将相关用户分配到该组</li>
+<li>创建项目</li>
+</ul>
+<h4 id="邮件配置"><a href="#邮件配置" class="headerlink" title="邮件配置"></a>邮件配置</h4><p>邮件也是Gitlab的一个重要的功能，比如新建用户后系统会发送一封激活邮件给用户，当项目有更新的时候也会发一封提醒邮件。</p>
+<p>打开gitlab配置文件:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/gitlab/gitlab.rb</span><br></pre></td></tr></table></figure>
+<p>下面以腾讯企业邮箱为例子，修改以下参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">gitlab_rails[&apos;smtp_enable&apos;] = true</span><br><span class="line">gitlab_rails[&apos;smtp_address&apos;] = &quot;smtp.exmail.qq.com&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_port&apos;] = 587</span><br><span class="line">gitlab_rails[&apos;smtp_user_name&apos;] = &quot;xxxx@xx.com&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_password&apos;] = &quot;password&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_authentication&apos;] = &quot;login&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_enable_starttls_auto&apos;] = true</span><br><span class="line">gitlab_rails[&apos;smtp_tls&apos;] = true</span><br><span class="line">gitlab_rails[&apos;gitlab_email_from&apos;] = &apos;xxxx@xx.com&apos;</span><br><span class="line">gitlab_rails[&apos;smtp_domain&apos;] = &quot;exmail.qq.com&quot;</span><br></pre></td></tr></table></figure>
+<p>保存后运行:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
+<p>其他邮箱可以参考官方给出的例子<a href="https://docs.gitlab.com/omnibus/settings/smtp.html#qq-exmail" target="_blank" rel="noopener">SMTP SETTING</a></p>
+<h4 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h4><p><a href="https://help.aliyun.com/knowledge_detail/42534.html" target="_blank" rel="noopener">云服务器 ECS Linux SWAP 配置概要说明</a></p>
+<p><a href="https://about.gitlab.com/installation/#centos-7" target="_blank" rel="noopener">Gitlab Installer</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Gitlab/" rel="tag"># Gitlab</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/16/Oh-My-Zsh的配置与使用/" rel="next" title="Oh-My-Zsh的配置与使用">
+                <i class="fa fa-chevron-left"></i> Oh-My-Zsh的配置与使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Lie" />
+            
+              <p class="site-author-name" itemprop="name">Lie</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/a5533348" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lym5533348@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开启SWAP"><span class="nav-number">2.</span> <span class="nav-text">开启SWAP</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#什么是SWAP呢？"><span class="nav-number">2.1.</span> <span class="nav-text">什么是SWAP呢？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SWAP设置"><span class="nav-number">2.2.</span> <span class="nav-text">SWAP设置</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装Gitlab"><span class="nav-number">3.</span> <span class="nav-text">安装Gitlab</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Gitlab使用"><span class="nav-number">4.</span> <span class="nav-text">Gitlab使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#邮件配置"><span class="nav-number">5.</span> <span class="nav-text">邮件配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#引用"><span class="nav-number">6.</span> <span class="nav-text">引用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lie</span>
+
+  
+</div>
+
+
+
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

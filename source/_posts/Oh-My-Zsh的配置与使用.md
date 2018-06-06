@@ -1,7 +1,8 @@
 ---
 title: Oh-My-Zsh的配置与使用
 date: 2018-04-16 14:23:22
-tags: Linux
+tags: zsh
+categories: Linux
 ---
 
 ### 什么是Shell？
@@ -117,7 +118,7 @@ arrow.zsh-theme               frisk.zsh-theme               lukerandall.zsh-them
 ....
 ```
 
-或者我们将主题设置为随机，每次打开命令行窗口，都会随机在默认主题中选择一个，如果遇到你喜欢的主题，可以输入命令查看其名字：
+或者我们将主题设置为随机('random')，每次打开命令行窗口，都会随机在默认主题中选择一个，如果遇到你喜欢的主题，可以输入命令查看其名字：
 
 ```
 $ echo $ZSH_THEME
@@ -182,6 +183,24 @@ plugins=(git zsh-autosuggestions)
 **zsh-syntax-highlighting**
 
 这是一个命令高亮插件，输入为绿色时表示可用命令，路径带有下划线时表示可用路径
+
+1.克隆到插件目录：
+
+```
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+```
+
+2.修改配置文件.zshrc:
+
+```
+plugins=(git zsh-syntax-highlighting)
+```
+
+最后别忘了让配置生效
+
+```
+source .zshrc
+```
 
 引用：  
 [终极 Shell](http://macshuo.com/?p=676). 
